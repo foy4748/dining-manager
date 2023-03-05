@@ -16,6 +16,7 @@ export default function DeActivationRequest() {
   // Generating Tomorrow Date for initial value
   const tomorrowDate = getTommorowDate();
   const [selectedDate, setDate] = useState<Date>(tomorrowDate);
+  const [disableSubmit, setDisableSubmit] = useState<Boolean>(true);
 
   // Grabbing De-activation Data
 
@@ -35,6 +36,7 @@ export default function DeActivationRequest() {
         };
         const res = await fetch(`${SERVER_URL}/deactivate-meal/`, options);
         const data = await res.json();
+        setDisableSubmit(false);
         return data;
       } catch (error) {
         console.error(error);
@@ -48,6 +50,7 @@ export default function DeActivationRequest() {
   };
 
   const handleSubmit = async () => {
+    setDisableSubmit(true);
     const submitObj = new Class_deactivationRequest(
       "123456789123456789123456",
       "242",
@@ -68,13 +71,15 @@ export default function DeActivationRequest() {
       const result = await res.json();
       if (result.alreadyExists) {
         toast("Already Exists", { icon: "💧" });
+      } else {
+        toast("Successfully Posted", { icon: "🟢" });
       }
-      toast("Successfully Posted", { icon: "🟢" });
       refetch();
       console.log(result);
     } catch (error) {
       console.error(error);
     }
+    setDisableSubmit(false);
   };
 
   if (isLoading) {
@@ -94,8 +99,10 @@ export default function DeActivationRequest() {
         </div>
         <Divider />
         <div className={styles.deactivateContainer}>
-          <DatePicker value={selectedDate} onChange={handleChange} />
-          <Button onClick={handleSubmit}>Submit</Button>
+          <DatePicker oneTap value={selectedDate} onChange={handleChange} />
+          <Button onClick={handleSubmit} disabled={disableSubmit}>
+            Submit
+          </Button>
         </div>
         <Divider />
         <div>

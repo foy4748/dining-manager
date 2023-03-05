@@ -1,0 +1,9 @@
+.mainLayout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.innerLayout {
+  padding-top: 3rem;
+  grid-column: 2/3;
+}
