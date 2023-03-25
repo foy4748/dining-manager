@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import toast from "react-hot-toast";
 import { Divider } from "rsuite";
+import ApiRoutes from "../ApiRoutes";
 
 export default function DeActivationRequest() {
   // Generating Tomorrow Date for initial value
@@ -34,7 +35,7 @@ export default function DeActivationRequest() {
             User_id: "123456789123456789123456",
           },
         };
-        const res = await fetch(`${SERVER_URL}/deactivate-meal/`, options);
+        const res = await fetch(ApiRoutes.get.deactivate_meal, options);
         const data = await res.json();
         setDisableSubmit(false);
         return data;
@@ -51,6 +52,7 @@ export default function DeActivationRequest() {
 
   const handleSubmit = async () => {
     setDisableSubmit(true);
+    toast("Posting Data", { icon: "⌛" });
     const submitObj = new Class_deactivationRequest(
       "123456789123456789123456",
       "242",
@@ -67,7 +69,7 @@ export default function DeActivationRequest() {
         },
         body: JSON.stringify(submitObj),
       };
-      const res = await fetch(`${SERVER_URL}/deactivate-meal/`, options);
+      const res = await fetch(ApiRoutes.post.deactivate_meal, options);
       const result = await res.json();
       if (result.alreadyExists) {
         toast("Already Exists", { icon: "💧" });
@@ -78,6 +80,7 @@ export default function DeActivationRequest() {
       console.log(result);
     } catch (error) {
       console.error(error);
+      toast("Something Went Wrong", { icon: "🔴" });
     }
     setDisableSubmit(false);
   };

@@ -1,40 +1,60 @@
+import { useState } from "react";
 import Class_activationRequest from "../Classes/ActivationRequest";
-import { Form, ButtonToolbar, Button } from "rsuite";
-import { useForm } from "react-hook-form";
+import { Formik, Field, Form } from "formik";
+import { Button } from "rsuite";
 import axios from "axios";
+import ApiRoutes from "../ApiRoutes";
+import DatePickerField from "../Forms/DatePickerField";
+import getTommorowDate from "../Utilities/getTommorowDate";
+import toast from "react-hot-toast";
 
 export default function ActivationRequest() {
-  const { register, handleSubmit } = useForm();
+  // [IMPORTANT]
+  // Load Committe Data during login
+  // to access Committe number
+  const [disableSubmit, setDisableSubmit] = useState<Boolean>(false);
 
-  const onSubmition = async (data) => {
-    const { card_no } = data;
+  const handleSubmit = async (submittingData: unknown) => {
+    setDisableSubmit(true);
+    toast("Posting Data", { icon: "⌛" });
     const formValues = new Class_activationRequest(
       "123456789123456789123456",
-      card_no,
+      "242",
       "206",
       "2023-03-07"
     );
-    const { data } = await axis.post(url, formValues, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+
+    try {
+      const URL = ApiRoutes.post.activate_meal;
+      const { data } = await axios.post(URL, formValues, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(data);
+      toast("Successfully Posted", { icon: "🟢" });
+    } catch (error) {
+      console.error(error);
+      toast("Something Went Wrong", { icon: "🔴" });
+    }
+    setDisableSubmit(false);
   };
 
   return (
-    <Form layout="horizontal" onSubmit={handleSubmit(onSubmition)}>
-      <Form.Group controlId="activation-request-sending-form">
-        <Form.ControlLabel>Card No</Form.ControlLabel>
-        <Form.Control {...register("card_no")} />
-      </Form.Group>
-      <Form.Group>
-        <ButtonToolbar>
-          <Button type="submit" appearance="primary">
+    <div>
+      <h1>Send Meal Activation Request</h1>
+      <br />
+      <Formik
+        initialValues={{ activation_date: getTommorowDate() }}
+        onSubmit={handleSubmit}
+      >
+        <Form>
+          <DatePickerField name="activation_date" oneTap={true} />
+          <Button disabled={disableSubmit} type="submit">
             Submit
           </Button>
-          <Button appearance="default">Cancel</Button>
-        </ButtonToolbar>
-      </Form.Group>
-    </Form>
+        </Form>
+      </Formik>
+    </div>
   );
 }
